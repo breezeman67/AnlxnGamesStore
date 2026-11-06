@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANLXNGAMES | Official Store</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #08090d;
+            --panel-bg: rgba(18, 20, 28, 0.75);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --panel-hover-border: rgba(255, 215, 0, 0.4);
+            --accent-gold: #ffd700;
+            --accent-gold-hover: #e6c200;
+            --ruby-red: #ff2a4b;
+            --emerald-green: #00e676;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas Background */
+        #spaceCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+
+        /* Glassmorphism Cards */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card {
+            background: rgba(20, 24, 36, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--panel-hover-border);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .featured-card {
+            background: linear-gradient(180deg, rgba(30, 35, 52, 0.8) 0%, rgba(18, 20, 28, 0.8) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.08);
+        }
+
+        /* Layout Structure */
+        .app-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(8, 9, 13, 0.85);
+            backdrop-filter: blur(16px);
+            border-b: 1px solid var(--panel-border);
+            padding: 12px 24px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            font-size: 18px;
+        }
+
+        .brand-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        .brand-title span {
+            color: var(--accent-gold);
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .player-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--panel-border);
+            padding: 4px 12px 4px 6px;
+            border-radius: 30px;
+        }
+
+        .player-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: #222;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .ign-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-family: monospace;
+            font-size: 13px;
+            width: 120px;
+        }
+
+        .ign-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Language Switcher Dropdown */
+        .lang-dropdown {
+            position: relative;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .lang-menu {
+            position: absolute;
+            right: 0;
+            top: 110%;
+            width: 150px;
+            background: rgba(18, 20, 28, 0.95);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 6px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .lang-menu.show {
+            display: flex;
+        }
+
+        .lang-option {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-option:hover, .lang-option.active {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        /* Main Workspace Layout */
+        .main-layout {
+            max-width: 1400px;
+            width: 100%;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 24px;
+            flex: 1;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Sidebar Tabs */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: rgba(20, 24, 36, 0.6);
+            border: 1px solid var(--panel-border);
+            color: var(--text-muted);
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            text-align: left;
+            width: 100%;
+        }
+
+        .nav-btn i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-btn.active {
+            background: var(--accent-gold);
+            color: #000;
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.25);
+        }
+
+        .cart-trigger-btn {
+            margin-top: auto;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--accent-gold);
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .cart-trigger-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+        .cart-badge {
+            background: var(--ruby-red);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        /* Main Grid Area */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        /* Minecraft Rank Badges Styling */
+        .rank-tag {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            text-align: center;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            margin-bottom: 12px;
+        }
+
+        .price-tag {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .price-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .price-unit {
+            font-size: 12px;
+            color: var(--accent-gold);
+            font-family: monospace;
+        }
+
+        .perks-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        .perks-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .perks-list i {
+            color: var(--accent-gold);
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 800;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-gold-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            width: 100%;
+            font-family: monospace;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* Ruby Cards Specifics */
+        .ruby-card-price {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            font-family: monospace;
+            margin-bottom: 8px;
+        }
+
+        .savings-tag {
+            display: inline-block;
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--emerald-green);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Cart Drawer Slide-out */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 360px;
+            max-width: 100%;
+            height: 100vh;
+            background: rgba(12, 14, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-l: 1px solid var(--panel-border);
+            z-index: 100;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .cart-drawer.active {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            border-b: 1px solid var(--panel-border);
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover { color: #fff; }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cart-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cart-footer {
+            border-t: 1px solid var(--panel-border);
+            padding-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: rgba(18, 20, 28, 0.95);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            max-width: 480px;
+            width: 100%;
+            padding: 24px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .modal-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-family: monospace;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .pay-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .pay-card:hover, .pay-card.selected {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 800;
+            font-size: 13px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 300;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Space Canvas Background -->
+    <canvas id="spaceCanvas"></canvas>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="brand" onclick="switchCategory('ranks')">
+                    <div class="brand-logo">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <div>
+                        <div class="brand-title">ANLX<span>GAMES</span></div>
+                        <div class="brand-sub">anlxngames.net</div>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <!-- Player IGN & Head Preview -->
+                    <div class="player-bar">
+                        <img id="playerHead" src="https://mc-heads.net/avatar/Steve/28" alt="Player" class="player-avatar">
+                        <input type="text" id="ignInput" class="ign-input" placeholder="Player IGN..." value="Steve" oninput="updateIGN(this.value)">
+                    </div>
+
+                    <!-- Language Switcher Dropdown -->
+                    <div class="lang-dropdown">
+                        <button class="lang-btn" onclick="toggleLangMenu()">
+                            <i class="fa-solid fa-globe text-yellow-400"></i>
+                            <span id="currentLangLabel">English</span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
+                        </button>
+                        <div class="lang-menu" id="langMenu">
+                            <button class="lang-option active" id="lang-en" onclick="setLanguage('en')">
+                                <span>🇺🇸 English</span>
+                            </button>
+                            <button class="lang-option" id="lang-zh" onclick="setLanguage('zh')">
+                                <span>🇹🇼 繁體中文</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="main-layout">
+            <!-- Left Sidebar Navigation -->
+            <aside class="sidebar">
+                <button class="nav-btn active" id="nav-ranks" onclick="switchCategory('ranks')">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span data-i18n="navRanks">VIP Ranks</span>
+                </button>
+
+                <button class="nav-btn" id="nav-rubies" onclick="switchCategory('rubies')">
+                    <i class="fa-solid fa-gem text-red-400"></i>
+                    <span data-i18n="navRubies">Ruby Currency</span>
+                </button>
+
+                <!-- Cart Button -->
+                <button class="cart-trigger-btn" onclick="toggleCartDrawer()">
+                    <span><i class="fa-solid fa-cart-shopping"></i> <span data-i18n="cartTitle">Cart</span></span>
+                    <span class="cart-badge" id="cartBadgeCount">0</span>
+                </button>
+            </aside>
+
+            <!-- Main Content Display -->
+            <main class="content-area">
+
+                <!-- SECTION 1: RANKS -->
+                <div id="section-ranks">
+                    <div class="section-title" style="margin-bottom: 16px;">
+                        <i class="fa-solid fa-infinity text-yellow-400"></i>
+                        <span data-i18n="ranksTitle">Lifetime & Subscription VIP Ranks</span>
+                    </div>
+
+                    <div class="grid-cards" id="ranksGrid">
+                        <!-- Dynamic Ranks render here -->
+                    </div>
+                </div>
+
+                <!-- SECTION 2: RUBIES -->
+                <div id="section-rubies" style="display: none;">
+                    <div class="section-title" style="margin-bottom: 6px;">
+                        <i class="fa-solid fa-gem" style="color: var(--ruby-red);"></i>
+                        <span data-i18n="rubiesTitle">Ruby Packs</span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); font-family: monospace; margin-bottom: 16px;" data-i18n="rubiesSub">
+                        Base rate: 200 Rubies per $1.00 USD. Save up to 33% on higher tiers!
+                    </p>
+
+                    <div class="grid-cards" id="rubiesGrid">
+                        <!-- Dynamic Rubies render here -->
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleCartDrawer()"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="drawer-header">
+            <div style="font-weight: 800; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-cart-shopping text-yellow-400"></i>
+                <span data-i18n="cartTitle">Shopping Cart</span>
+            </div>
+            <button class="close-btn" onclick="toggleCartDrawer()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="cart-items" id="cartItemsList">
+            <!-- Dynamic Cart Items -->
+        </div>
+
+        <div class="cart-footer">
+            <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 14px;">
+                <span data-i18n="cartTotal">Total:</span>
+                <span id="cartTotalText" style="color: var(--accent-gold); font-family: monospace;">$0.00 USD</span>
+            </div>
+            <button class="btn-primary" onclick="openCheckoutModal()" data-i18n="btnCheckout">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- View Perks Modal -->
+    <div class="modal-overlay" id="perksModal">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div id="modalRankTag"></div>
+                    <div class="modal-title" id="modalRankTitle">Rank Perks</div>
+                </div>
+                <button class="close-btn" onclick="closeModal('perksModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto;" id="modalPerksList">
+                <!-- Dynamic Perks list -->
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn-secondary" onclick="closeModal('perksModal')" style="width: auto; padding: 8px 20px;" data-i18n="btnClose">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div class="modal-title" data-i18n="checkoutTitle">Checkout Order</div>
+                    <div class="modal-subtitle" data-i18n="checkoutSub">Verify player details and select payment method</div>
+                </div>
+                <button class="close-btn" onclick="closeModal('checkoutModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--panel-border); display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <img id="checkoutAvatar" src="https://mc-heads.net/avatar/Steve/36" style="width: 36px; height: 36px; border-radius: 6px;" alt="Avatar">
+                <div>
+                    <div style="font-size: 11px; color: var(--text-muted);" data-i18n="deliveringTo">Delivering to IGN:</div>
+                    <div style="font-weight: 800; font-family: monospace;" id="checkoutIgnDisplay">Steve</div>
+                </div>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 700; color: #fff;" data-i18n="selectPayment">Select Payment Method:</div>
+            <div class="payment-methods">
+                <div class="pay-card selected" onclick="selectPayment(this)"><i class="fa-brands fa-paypal"></i> PayPal</div>
+                <div class="pay-card" onclick="selectPayment(this)"><i class="fa-solid fa-credit-card"></i> Credit Card</div>
+            </div>
+
+            <button class="btn-primary" onclick="processPayment()" style="padding: 12px; font-size: 14px; margin-top: 10px;" data-i18n="btnPayNow">Complete Purchase</button>
+        </div>
+    </div>
+
+    <!-- Receipt Success Modal -->
+    <div class="modal-overlay" id="receiptModal">
+        <div class="modal-box" style="text-align: center;">
+            <div style="width: 60px; height: 60px; background: rgba(0, 230, 118, 0.15); border: 2px solid var(--emerald-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--emerald-green); font-size: 24px;">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="modal-title" data-i18n="receiptTitle">Payment Successful!</div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;" data-i18n="receiptSub">Your ranks & rubies have been instantly dispatched to your account on anlxngames.net.</p>
+            <button class="btn-primary" onclick="closeModal('receiptModal')" data-i18n="btnDone">Done</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastText">Item added to cart!</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /* ================= I18N DICTIONARIES ================= */
+        const i18n = {
+            en: {
+                navRanks: "VIP Ranks",
+                navRubies: "Ruby Currency",
+                cartTitle: "Shopping Cart",
+                ranksTitle: "Lifetime & Subscription VIP Ranks",
+                rubiesTitle: "Ruby Packs",
+                rubiesSub: "Base rate: 200 Rubies per $1.00 USD. Save up to 33% on higher tiers!",
+                cartTotal: "Total:",
+                btnCheckout: "Proceed to Checkout",
+                btnClose: "Close",
+                checkoutTitle: "Checkout Order",
+                checkoutSub: "Verify player details and select payment method",
+                deliveringTo: "Delivering to IGN:",
+                selectPayment: "Select Payment Method:",
+                btnPayNow: "Complete Purchase",
+                receiptTitle: "Payment Successful!",
+                receiptSub: "Your ranks & rubies have been instantly dispatched to your account on anlxngames.net.",
+                btnDone: "Done",
+                viewDetails: "View Details",
+                addToCart: "Add to Cart",
+                buyPack: "Buy Pack",
+                emptyCart: "Your cart is empty.",
+                permanent: "Permanent Lifetime",
+                monthly: "Monthly Subscription",
+                saveText: "Save"
+            },
+            zh: {
+                navRanks: "VIP 階級",
+                navRubies: "紅寶石儲值",
+                cartTitle: "購物車",
+                ranksTitle: "永久與每月訂閱 VIP 階級",
+                rubiesTitle: "紅寶石禮包",
+                rubiesSub: "基準匯率: 1.00 美元可換取 200 紅寶石。最高可享 33% 優惠！",
+                cartTotal: "總計金額:",
+                btnCheckout: "前往結帳",
+                btnClose: "關閉",
+                checkoutTitle: "確認結帳訂單",
+                checkoutSub: "請確認遊戲玩家名稱與付款方式",
+                deliveringTo: "發送目標玩家 (IGN):",
+                selectPayment: "選擇付款方式:",
+                btnPayNow: "立即付款",
+                receiptTitle: "付款成功！",
+                receiptSub: "您購買的階級與紅寶石已即時發送至您的 anlxngames.net 帳戶。",
+                btnDone: "完成",
+                viewDetails: "查看詳細權限",
+                addToCart: "加入購物車",
+                buyPack: "立即購買",
+                emptyCart: "您的購物車目前是空的。",
+                permanent: "永久尊榮",
+                monthly: "每月訂閱",
+                saveText: "省下"
+            }
+        };
+
+        const rankData = [
+            {
+                id: 'iron',
+                tagHTML: '<span style="color:#9CA3AF">[</span><span style="color:#FFFFFF; font-weight:bold;">IRON</span><span style="color:#9CA3AF">]</span>',
+                rubies: 899,
+                sub: 'permanent',
+                enName: "IRON Rank",
+                zhName: "鐵級 [IRON]",
+                enPerks: [
+                    "/fly in lobby",
+                    "No chat cooldown (3s)",
+                    "Gift rank command (/gift)",
+                    "/fw for fireworks"
+                ],
+                zhPerks: [
+                    "大廳開啟飛行動行 (/fly)",
+                    "取消聊天 3 秒冷卻限制",
+                    "解鎖贈送階級功能 (/gift)",
+                    "發放煙火效果 (/fw)"
+                ]
+            },
+            {
+                id: 'gold',
+                tagHTML: '<span style="color:#FFD700; font-weight:bold;">[GOLD]</span>',
+                rubies: 1599,
+                sub: 'permanent',
+                enName: "GOLD Rank",
+                zhName: "黃金級 [GOLD]",
+                enPerks: [
+                    "Includes ALL Iron Rank Perks",
+                    "Unlimited friend list",
+                    "Daily rubies [x2 multiplier]",
+                    "Create Guild access"
+                ],
+                zhPerks: [
+                    "包含所有 IRON 鐵級權限",
+                    "無上限好友列表",
+                    "每日紅寶石獎勵 [x2 倍率]",
+                    "創建公會權限"
+                ]
+            },
+            {
+                id: 'diamond',
+                tagHTML: '<span style="color:#00F0FF; font-weight:bold;">[DIAMOND]</span>',
+                rubies: 2099,
+                sub: 'permanent',
+                enName: "DIAMOND Rank",
+                zhName: "鑽石級 [DIAMOND]",
+                enPerks: [
+                    "Includes ALL Gold Rank Perks",
+                    "Auto quest completion",
+                    "Early Discord info channel access"
+                ],
+                zhPerks: [
+                    "包含所有 GOLD 黃金級權限",
+                    "自動完成每日任務",
+                    "Discord 搶先獨家資訊頻道"
+                ]
+            },
+            {
+                id: 'diamond_prime',
+                tagHTML: '<span style="color:#00F0FF; font-weight:bold;">[DIAMOND</span> <span style="color:#2B70FF; font-weight:bold;">PRIME]</span>',
+                rubies: 3499,
+                sub: 'permanent',
+                enName: "DIAMOND PRIME Rank",
+                zhName: "尊爵鑽石 [DIAMOND PRIME]",
+                enPerks: [
+                    "Includes ALL Diamond Rank Perks",
+                    "Private Games Host Access"
+                ],
+                zhPerks: [
+                    "包含所有 DIAMOND 鑽石級權限",
+                    "開立私人自訂房間權限"
+                ]
+            },
+            {
+                id: 'ruby_prime',
+                tagHTML: '<span style="color:#8B0000; font-weight:bold;">[</span><span style="color:#FF2A4B; font-weight:bold;">RUBY</span> <span style="color:#8B0000; font-weight:bold;">PRIME]</span>',
+                rubies: 5967,
+                sub: 'permanent',
+                enName: "RUBY PRIME Rank",
+                zhName: "紅寶石 PRIME [RUBY PRIME]",
+                enPerks: [
+                    "Includes ALL Diamond Prime Perks",
+                    "Choose preferred map",
+                    "XP booster (1 bottle / month)",
+                    "/mob to summon creature in lobby",
+                    "Custom join lobby message",
+                    "Special gift delivery monthly"
+                ],
+                zhPerks: [
+                    "包含所有 DIAMOND PRIME 權限",
+                    "地圖優先投票選擇權",
+                    "經驗加倍瓶 (每月 1 瓶)",
+                    "大廳生成生物功能 (/mob)",
+                    "自訂進房全伺服器廣播",
+                    "每月限定專屬驚喜禮包"
+                ]
+            },
+            {
+                id: 'ruby_prime_plus',
+                tagHTML: '<span style="color:#8B0000; font-weight:bold;">[</span><span style="color:#FF2A4B; font-weight:bold;">RUBY</span> <span style="color:#8B0000; font-weight:bold;">PRIME</span><span style="color:#00E676; font-weight:bold;">+</span><span style="color:#8B0000; font-weight:bold;">]</span>',
+                rubies: 799,
+                sub: 'monthly',
+                enName: "RUBY PRIME+ Sub",
+                zhName: "紅寶石 PRIME+ 訂閱",
+                enPerks: [
+                    "Includes ALL Ruby Prime Perks",
+                    "Custom + color editor",
+                    "Access to /nick command",
+                    "Change guild tag color (Owner)"
+                ],
+                zhPerks: [
+                    "包含所有 RUBY PRIME 權限",
+                    "自訂 + 號符號顏色",
+                    "隱藏名稱暱稱功能 (/nick)",
+                    "修改公會標籤顏色 (會長)"
+                ]
+            },
+            {
+                id: 'ruby_prime_plus_plus',
+                tagHTML: '<span style="color:#8B0000; font-weight:bold;">[</span><span style="color:#FF2A4B; font-weight:bold;">RUBY</span> <span style="color:#8B0000; font-weight:bold;">PRIME</span><span style="color:#00E676; font-weight:bold;">++</span><span style="color:#8B0000; font-weight:bold;">]</span>',
+                rubies: 1399,
+                sub: 'monthly',
+                enName: "RUBY PRIME++ Sub",
+                zhName: "紅寶石 PRIME++ 頂級訂閱",
+                enPerks: [
+                    "Includes ALL Ruby Prime+ Perks",
+                    "/tnt fun command in pre-game lobbies",
+                    "Custom prestige color & symbols",
+                    "10% OFF all store Ruby purchases",
+                    "/lightning in lobby to strike someone randomly (30s CD)"
+                ],
+                zhPerks: [
+                    "包含所有 RUBY PRIME+ 權限",
+                    "等候大廳趣味 TNT (/tnt)",
+                    "自訂轉生聲望顏色與圖騰",
+                    "商店儲值紅寶石享 10% 折扣",
+                    "大廳隨機落雷召喚 (/lightning, 30秒CD)"
+                ]
+            }
+        ];
+
+        const rubyData = [
+            { amount: 1000, price: 5.00, regular: 5.00, discount: "" },
+            { amount: 2500, price: 12.00, regular: 12.50, discount: "Save 4%" },
+            { amount: 5000, price: 20.00, regular: 25.00, discount: "Save 20%" },
+            { amount: 10000, price: 40.00, regular: 50.00, discount: "Save 20%" },
+            { amount: 15000, price: 55.00, regular: 75.00, discount: "Save 27%" },
+            { amount: 30000, price: 100.00, regular: 150.00, discount: "Save 33%!" }
+        ];
+
+        /* State Variables */
+        let currentLang = 'en';
+        let cart = [];
+        let playerIGN = "Steve";
+
+        /* Render Logic */
+        function renderStore() {
+            // Render Ranks
+            const ranksContainer = document.getElementById('ranksGrid');
+            ranksContainer.innerHTML = rankData.map(rank => {
+                const name = currentLang === 'zh' ? rank.zhName : rank.enName;
+                const perks = currentLang === 'zh' ? rank.zhPerks : rank.enPerks;
+                const subText = i18n[currentLang][rank.sub];
+
+                return `
+                    <div class="glass-card ${rank.id.includes('plus') ? 'featured-card' : ''}">
+                        <div>
+                            <div class="rank-tag">${rank.tagHTML}</div>
+                            <div class="price-tag">
+                                <span class="price-val">${rank.rubies.toLocaleString()}</span>
+                                <span class="price-unit">Rubies</span>
+                                <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">${subText}</div>
+                            </div>
+                            <ul class="perks-list">
+                                ${perks.map(p => `<li><i class="fa-solid fa-check"></i> <span>${p}</span></li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-secondary" onclick="openPerksModal('${rank.id}')">${i18n[currentLang].viewDetails}</button>
+                            <button class="btn-primary" onclick="addRankToCart('${rank.id}')">${i18n[currentLang].addToCart}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render Rubies
+            const rubiesContainer = document.getElementById('rubiesGrid');
+            rubiesContainer.innerHTML = rubyData.map(pack => {
+                return `
+                    <div class="glass-card">
+                        <div>
+                            ${pack.discount ? `<span class="savings-tag">${pack.discount}</span>` : ''}
+                            <div style="font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 4px;">
+                                ${pack.amount.toLocaleString()} <span style="font-size: 14px; color: var(--ruby-red);">Rubies</span>
+                            </div>
+                            <div class="ruby-card-price">$${pack.price.toFixed(2)} USD</div>
+                            <div style="font-size: 11px; color: var(--text-muted); font-family: monospace;">
+                                Regular: <span style="text-decoration: line-through;">$${pack.regular.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <button class="btn-primary" style="margin-top: 16px;" onclick="addRubyToCart(${pack.amount}, ${pack.price})">${i18n[currentLang].buyPack}</button>
+                    </div>
+                `;
+            }).join('');
+
+            // Update UI Labels
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerText = i18n[currentLang][key];
+                }
+            });
+
+            updateCartUI();
+        }
+
+        /* Language Controls */
+        function toggleLangMenu() {
+            document.getElementById('langMenu').classList.toggle('show');
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('currentLangLabel').innerText = lang === 'en' ? 'English' : '繁體中文';
+            document.querySelectorAll('.lang-option').forEach(el => el.classList.remove('active'));
+            document.getElementById(`lang-${lang}`).classList.add('active');
+            document.getElementById('langMenu').classList.remove('show');
+            renderStore();
+        }
+
+        /* Cart Functions */
+        function addRankToCart(rankId) {
+            const rank = rankData.find(r => r.id === rankId);
+            if (!rank) return;
+            cart.push({
+                type: 'rank',
+                name: currentLang === 'zh' ? rank.zhName : rank.enName,
+                costText: `${rank.rubies} Rubies`,
+                priceVal: 0
+            });
+            updateCartUI();
+            showToast(`${rank.enName} added to cart!`);
+        }
+
+        function addRubyToCart(amount, price) {
+            cart.push({
+                type: 'ruby',
+                name: `${amount.toLocaleString()} Rubies Pack`,
+                costText: `$${price.toFixed(2)} USD`,
+                priceVal: price
+            });
+            updateCartUI();
+            showToast(`${amount} Rubies added to cart!`);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartBadgeCount').innerText = cart.length;
+            const container = document.getElementById('cartItemsList');
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 40px;">${i18n[currentLang].emptyCart}</div>`;
+                document.getElementById('cartTotalText').innerText = "$0.00 USD";
+                return;
+            }
+
+            let totalUSD = 0;
+            container.innerHTML = cart.map((item, idx) => {
+                totalUSD += item.priceVal;
+                return `
+                    <div class="cart-item">
+                        <div>
+                            <div style="font-size: 13px; font-weight: 700; color: #fff;">${item.name}</div>
+                            <div style="font-size: 11px; color: var(--accent-gold); font-family: monospace;">${item.costText}</div>
+                        </div>
+                        <button style="background: none; border: none; color: var(--ruby-red); cursor: pointer;" onclick="removeFromCart(${idx})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cartTotalText').innerText = `$${totalUSD.toFixed(2)} USD`;
+        }
+
+        function toggleCartDrawer() {
+            document.getElementById('cartDrawer').classList.toggle('active');
+            document.getElementById('drawerOverlay').classList.toggle('active');
+        }
+
+        /* Navigation Switcher */
+        function switchCategory(cat) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`nav-${cat}`).classList.add('active');
+
+            if (cat === 'ranks') {
+                document.getElementById('section-ranks').style.display = 'block';
+                document.getElementById('section-rubies').style.display = 'none';
+            } else {
+                document.getElementById('section-ranks').style.display = 'none';
+                document.getElementById('section-rubies').style.display = 'block';
+            }
+        }
+
+        /* Modals */
+        function openPerksModal(rankId) {
+            const rank = rankData.find(r => r.id === rankId);
+            if (!rank) return;
+
+            document.getElementById('modalRankTag').innerHTML = rank.tagHTML;
+            document.getElementById('modalRankTitle').innerText = currentLang === 'zh' ? rank.zhName : rank.enName;
+            
+            const perks = currentLang === 'zh' ? rank.zhPerks : rank.enPerks;
+            document.getElementById('modalPerksList').innerHTML = perks.map(p => `
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); padding: 10px; border-radius: 8px; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-check text-yellow-400"></i>
+                    <span>${p}</span>
+                </div>
+            `).join('');
+
+            openModal('perksModal');
+        }
+
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                showToast(i18n[currentLang].emptyCart);
+                return;
+            }
+            document.getElementById('checkoutIgnDisplay').innerText = playerIGN;
+            document.getElementById('checkoutAvatar').src = `https://mc-heads.net/avatar/${playerIGN}/36`;
+            toggleCartDrawer();
+            openModal('checkoutModal');
+        }
+
+        function processPayment() {
+            closeModal('checkoutModal');
+            cart = [];
+            updateCartUI();
+            openModal('receiptModal');
+        }
+
+        function selectPayment(el) {
+            document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        /* IGN & Avatar Handler */
+        function updateIGN(val) {
+            playerIGN = val.trim() || 'Steve';
+            document.getElementById('playerHead').src = `https://mc-heads.net/avatar/${playerIGN}/28`;
+        }
+
+        /* Toast Popup */
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        /* Canvas Particle Space Animation */
+        function initSpaceBackground() {
+            const canvas = document.getElementById('spaceCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const stars = Array.from({ length: 150 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                alpha: Math.random(),
+                speed: Math.random() * 0.2 + 0.05
+            }));
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Subtle Nebula gradient background
+                const grad = ctx.createRadialGradient(
+                    canvas.width / 2, canvas.height / 3, 50,
+                    canvas.width / 2, canvas.height / 3, canvas.width * 0.7
+                );
+                grad.addColorStop(0, 'rgba(120, 40, 200, 0.12)');
+                grad.addColorStop(0.5, 'rgba(20, 30, 80, 0.08)');
+                grad.addColorStop(1, 'rgba(8, 9, 13, 0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Stars
+                ctx.fillStyle = '#ffffff';
+                stars.forEach(star => {
+                    star.y -= star.speed;
+                    if (star.y < 0) star.y = canvas.height;
+
+                    ctx.globalAlpha = 0.3 + Math.sin(Date.now() * 0.002 + star.x) * 0.3;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        /* Initialize App */
+        window.addEventListener('DOMContentLoaded', () => {
+            initSpaceBackground();
+            renderStore();
+            
+            // Close dropdown when clicking outside
+            window.addEventListener('click', (e) => {
+                if (!e.target.closest('.lang-dropdown')) {
+                    document.getElementById('langMenu').classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
